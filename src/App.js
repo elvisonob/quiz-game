@@ -11,12 +11,21 @@ function App() {
   }
 
   const checkAnswers = function (questionObject, selectedAnswer) {
-    console.log(`You made a selection, ${selectedAnswer}`);
-    if (selectedAnswer === questionObject.correct_answer) {
-      console.log("You are correct");
-    } else {
-      console.log("You are wrong");
-    }
+    const allQuestionsCopy = list.map(function (listElement) {
+      if (listElement === questionObject) {
+        const questionCopy = { ...questionObject };
+        questionCopy.isAnswered = true;
+        if (selectedAnswer === questionObject.correct_answer) {
+          console.log((questionCopy.answeredCorrectly = true));
+        } else {
+          console.log((questionCopy.answeredCorrectly = false));
+        }
+        return questionCopy;
+      } else {
+        return listElement;
+      }
+    });
+    setList(allQuestionsCopy);
   };
 
   useEffect(() => {
@@ -31,7 +40,7 @@ function App() {
   return (
     <div className="App">
       <h1>Quiz</h1>
-      {list.map((question) => {
+      {list.map((question, index) => {
         console.log(question);
         const allAnswers = [
           ...question.incorrect_answers,
@@ -39,15 +48,18 @@ function App() {
         ];
         shuffleArray(allAnswers);
         return (
-          <div className="question">
+          <div key={index} className="question">
             <p>{question.question}</p>
-            {allAnswers.map((option) => {
-              return (
-                <button onClick={() => checkAnswers(question, option)}>
-                  {option}
-                </button>
-              );
-            })}
+            {question.answeredCorrectly && <p>Correct!✌️</p>}
+            {question.answeredCorrectly === false && <p>Wrong❌</p>}
+            {question.isAnswered !== true &&
+              allAnswers.map((option) => {
+                return (
+                  <button onClick={() => checkAnswers(question, option)}>
+                    {option}
+                  </button>
+                );
+              })}
           </div>
         );
       })}
